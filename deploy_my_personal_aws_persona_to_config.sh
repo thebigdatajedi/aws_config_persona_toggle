@@ -25,7 +25,7 @@ else
 fi
 
 # Copy contents from source to target directory
-cp -r "$src_dir" "$target_dir"
+cp -rf "$src_dir" "$target_dir"
 if [ $? -ne 0 ]; then
     echo "Failed to copy contents. Exiting..."
     exit 1
@@ -44,7 +44,6 @@ eval $(op signin my)
 
 # Fetch the required items
 profile=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="username").value')
-sso_account_id=$(op get item "SYSP" 
 sso_session=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="sso_session").value')
 sso_account_id=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="sso_account_id").value')
 sso_role_name=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="sso_role_name").value')
