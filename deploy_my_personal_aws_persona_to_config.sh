@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# Verifying dependencies before running.
+if ! command -v bashdb &> /dev/null #user will use bashdb to debug the script if it fails
+then
+    echo "bashdb could not be found"
+    exit
+fi
+
+if ! command -v op &> /dev/nullf #user will use op to fetch the required items from 1password
+then
+    echo "op could not be found"
+    exit
+fi
+
+echo "Both bashdb and op are installed"
+# Continue with the rest of your script:
+
 # Define source and target directories
 src_dir="$HOME/.aws/"
 target_dir="$HOME/.aws_bak/"
@@ -51,12 +67,13 @@ fi
 eval $(op signin --raw)
 
 # Fetch the required items
-profile=$(op read "op://SYSP/AWSP/username")
-sso_account_id=$(op read "op://SYSP/AWSP/sso_account_id")
-sso_session=$(op read "op://SYSP/AWSP/sso_session")
-sso_role_name=$(op read "op://SYSP/AWSP/sso_role_name")
-region=$(op read "op://SYSP/AWSP/region")
-output=$(op read "op://SYSP/AWSP/output")
+#The name of the varables in the script will almost alway be the names of the categoreis in 1password.
+profile=$(op read "op://VAULT_NAME/ITEM/CATEGORY1")
+sso_account_id=$(op read "op://VAULT_NAME/ITEM/CATEGORY2")
+sso_session=$(op read "op://VAULT_NAME/ITEM/CATEGORY3")
+sso_role_name=$(op read "op://VAULT_NAME/ITEM/CATEGORY4")
+region=$(op read "op://VAULT_NAME/ITEM/CATEGORY5")
+output=$(op read "op://VAULT_NAME/ITEM/CATEGORY6")
 
 # Verify if variables are set
 if [[ -z "$profile" || -z "$sso_session" || -z "$sso_account_id" || -z "$sso_role_name" || -z "$region" || -z "$output" ]]; then
