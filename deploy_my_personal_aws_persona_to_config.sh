@@ -47,7 +47,7 @@ else
     exit 1
 fi
 
-eval $(op signin)
+eval $(op signin --raw)
 
 # Fetch the required items
 profile=$(op read "op://SYSP/AWSP/username")
@@ -58,26 +58,19 @@ region=$(op read "op://SYSP/AWSP/region")
 output=$(op read "op://SYSP/AWSP/output")
 
 # Create config file and write configuration
-# echo "[$profile]
-# sso_session = $sso_session
-# sso_account_id = $sso_account_id
-# sso_role_name = $sso_role_name
-# region = $region
-# output = $output" > "$config_file"
-
-region_string=$region
-
-echo "[$profile]
+echo "$profile
 sso_session = $sso_session
 sso_account_id = $sso_account_id
 sso_role_name = $sso_role_name
-region = $region_string
+region = $region
 output = $output" > "$config_file"
 
-if [ $? -eq 0 ]; then
-    echo "Configuration has been written to the config file."
-    echo "Config file has been saved."
-else
-    echo "Failed to write configuration to the config file. Exiting..."
-    exit 1
-fi
+
+
+# if [ $? -eq 0 ]; then
+#     echo "Configuration has been written to the config file."
+#     echo "Config file has been saved."
+# else
+#     echo "Failed to write configuration to the config file. Exiting..."
+#     exit 1
+# fi
