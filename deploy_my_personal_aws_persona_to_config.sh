@@ -25,7 +25,7 @@ else
 fi
 
 # Copy contents from source to target directory
-cp -rf "$src_dir" "$target_dir"
+cp -r "$src_dir" "$target_dir"
 if [ $? -ne 0 ]; then
     echo "Failed to copy contents. Exiting..."
     exit 1
@@ -39,23 +39,39 @@ if [ -f "$config_file" ]; then
     rm "$config_file"
 fi
 
-# Sign in to your 1Password account
-eval $(op signin my)
+# Read authentication data from config file
+if [ -f "auth.config" ]; then
+    source "auth.config"
+else
+    echo "Authentication config file not found. Exiting..."
+    exit 1
+fi
+
+eval $(op signin)
 
 # Fetch the required items
-profile=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="username").value')
-sso_session=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="sso_session").value')
-sso_account_id=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="sso_account_id").value')
-sso_role_name=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="sso_role_name").value')
-region=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="region").value')
-output=$(op get item "SYSP" | jq -r '.details.fields[] | select(.designation=="output").value')
+profile=$(op read "op://SYSP/AWSP/username")
+sso_account_id=$(op read "op://SYSP/AWSP/sso_account_id")
+sso_session=$(op read "op://SYSP/AWSP/sso_session")
+sso_role_name=$(op read "op://SYSP/AWSP/sso_role_name")
+region=$(op read "op://SYSP/AWSP/region")
+output=$(op read "op://SYSP/AWSP/output")
 
 # Create config file and write configuration
+# echo "[$profile]
+# sso_session = $sso_session
+# sso_account_id = $sso_account_id
+# sso_role_name = $sso_role_name
+# region = $region
+# output = $output" > "$config_file"
+
+region_string=$region
+
 echo "[$profile]
 sso_session = $sso_session
 sso_account_id = $sso_account_id
 sso_role_name = $sso_role_name
-region = $region
+region = $region_string
 output = $output" > "$config_file"
 
 if [ $? -eq 0 ]; then
