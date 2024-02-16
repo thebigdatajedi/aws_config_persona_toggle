@@ -42,6 +42,7 @@ fi
 # Read authentication data from config file
 if [ -f "auth.config" ]; then
     source "auth.config"
+    echo "Authentication config has been loaded to memory."
 else
     echo "Authentication config file not found. Exiting..."
     exit 1
@@ -57,6 +58,14 @@ sso_role_name=$(op read "op://SYSP/AWSP/sso_role_name")
 region=$(op read "op://SYSP/AWSP/region")
 output=$(op read "op://SYSP/AWSP/output")
 
+# Verify if variables are set
+if [[ -z "$profile" || -z "$sso_session" || -z "$sso_account_id" || -z "$sso_role_name" || -z "$region" || -z "$output" ]]; then
+    echo "One or more variables are empty. Exiting..."
+    exit 1
+else
+    echo "All variables are set."
+fi
+
 # Create config file and write configuration
 echo "$profile
 sso_session = $sso_session
@@ -65,12 +74,10 @@ sso_role_name = $sso_role_name
 region = $region
 output = $output" > "$config_file"
 
-
-
-# if [ $? -eq 0 ]; then
-#     echo "Configuration has been written to the config file."
-#     echo "Config file has been saved."
-# else
-#     echo "Failed to write configuration to the config file. Exiting..."
-#     exit 1
-# fi
+if [ $? -eq 0 ]; then
+    echo "Configuration has been written to the config file."
+    echo "Config file has been saved."
+else
+    echo "Failed to write configuration to the config file. Exiting..."
+    exit 1
+fi
